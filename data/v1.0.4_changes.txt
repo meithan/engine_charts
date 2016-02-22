@@ -1,0 +1,34 @@
+LV-909: no changes
+LV-T30: no changes
+LV-T45: no changes
+LV-N: no changes
+Mk-55: no changes
+RAPIER: no changes
+Skipper: no changes
+Mainsail: no changes
+Mammoth: no changes
+LV-1R: no changes
+24-77: no changes
+48-7S: no changes
+O-10: no changes
+Dawn: no changes
+
+Aerospike:
+ mass: 1.5 -> 1.0 t
+ atmoCurve: two extra points: (5, 230), (10,170)
+Poodle:
+ atmoCurve: (1,85) -> (1,90)
+Rhino:
+ mass: 8.5 -> 9 t
+ atmoCurve: (1,170) -> (1,255), (5,0.001) -> (4,0.001)
+Twin Boar:
+ mass: 10 -> 10.5 t   (effective: 6 -> 6.5 t)
+LV-1:
+ atmoCurve: (1,85) -> (1,80)
+
+Changed:
+T-1 Aerospike: Mass reduced to 1t (formerly 1.5)
+LV-1 Ant: Sea level Isp reduced to 80sec (formerly 85)
+RE-L10 Poodle: Sea level Isp increased to 90sec (formerly 85)
+CR-7 RAPIER: Max thrust increased to 180KN (formerly 140)
+KR-2L Rhino: Cost increased to $25,000 (formerly 21,000) Mass increased to 9t (formerly 8.5) Sea level Isp increased to 255sec (formerly 170) Atm curve extended to .001 @ 5 Atm (formerly 4)

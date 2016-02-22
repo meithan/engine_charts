@@ -1,0 +1,47 @@
+.dl-horizontal dt {
+  text-align: left;
+  width: auto;
+  padding-bottom: 4px;
+}
+
+.dl-horizontal dd {
+  margin-left: 100px;
+  padding-bottom: 4px;
+}
+
+.detailstable table{
+  width: 100%;
+  table-layout: fixed;
+}
+
+.detailstable tr td {
+  /* border: 1px solid black; */
+}
+
+.tooltip.top .tooltip-inner {
+  background-color: black;
+  font-size: 13px;
+  color: white;
+/*  box-shadow: 3px 3px 3px black;*/
+}
+.tooltip.top .tooltip-arrow {
+  border-top-color: black;
+}
+
+.tooltip-inner {
+  font-size: 13px;
+  min-width: 150px;
+  max-width: 300px;
+}
+
+.glyphicon {
+  vertical-align: baseline;
+}
+
+/* Fixed variable tabbed selector overrides */
+
+.nav > li > a:hover {
+  background-color: #e5e5e5;
+}
+
+
