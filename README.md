@@ -1,6 +1,6 @@
 # Optimal Engine Charts v1.1.0
 
-#### An interactive webapp for Kerbal Space Program v1.0.5
+#### An interactive webapp for Kerbal Space Program 1.0.5
 
 ##### Live URL: [http://meithan.net/KSP/engines](http://meithan.net/KSP/engines/)
 
@@ -33,8 +33,8 @@ Fore more info (like details on how the calculations are done) or to leave a mes
 
 ##### Version history
 
-* 1.1.0 (February 22, 2015): Added fixed variable selector, moved project to Github, refactored a lot of code.
-* 1.0.1 (February 19, 2015): Updated engine stats to 1.0.5 (only change is the addition of the Vector engine).
+* 1.1.0 (February 22, 2016): Added fixed variable selector, moved project to Github, refactored a lot of code.
+* 1.0.1 (February 19, 2016): Updated engine stats to 1.0.5 (only change is the addition of the Vector engine).
 * 1.0.0 (June 30, 2015): Initial release.
 
 ##### License
