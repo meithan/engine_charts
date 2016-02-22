@@ -57,41 +57,18 @@ see http://glyphicons.com/license/ for more information.
 <!-- Load the Paper.js library -->
 <script type="text/javascript" src="js/paper-full.min.js"></script>
 
-<!-- Define inlined PaperScript associate it with myCanvas -->
+<!-- Load JavaScript -->
+<script type="text/javascript" src="code/atmosphereCurve.js"></script>
+<script type="text/javascript" src="code/engine.js"></script>
+<script type="text/javascript" src="code/globals.js"></script>
+<script type="text/javascript" src="code/calculations.js"></script>
+<script type="text/javascript" src="code/inputform.js"></script>
+<script type="text/javascript" src="code/detailspanel.js"></script>
+<script type="text/javascript" src="code/enginechart.js"></script>
+
+<!-- Define inlined PaperScript and associate it with myCanvas -->
 <script type="text/javascript" canvas="myCanvas">
-
-  // Color palette
-//  palette = [[77,77,77],[93,165,218],[250,164,58],[96,189,104],[241,124,176],[178,145,47],[178,118,178],[222,207,63],[241,88,84]];
-//  palette = [[136,189,230],[38,93,171],[251,178,88],[223,92,36],[144,205,151],[5,151,72],[229,18,111],[85,85,85],[157,114,42],[123,58,150],[199,180,46],[215,31,39],[237,221,70],[228,186,127]];
-//  palette = [[166,206,227],[31,120,180],[178,223,138],[51,160,44],[251,154,153],[227,26,28],[253,191,111],[255,127,0],[202,178,214],[106,61,154],[255,255,153],[177,89,40]];
-  palette = [[227, 196, 113], [114, 72, 153], [253, 160, 58], [211, 197, 153], [78, 150, 196], [231, 55, 42], [74, 150, 167], [227, 154, 140], [214, 166, 163], [103, 185, 82], [98, 158, 69], [248, 133, 25], [248, 161, 96], [162, 129, 189], [238, 86, 86], [169, 216, 140], [177, 89, 40], [166, 206, 227],[77,77,77],[250,164,58]]
-  
-  // Global chart settings
-  var mapx = 500;
-  var mapy = 500;
-  var ticklength = mapx/70;
-  var tickLabelPad = 20;
-  var fontSize = 18;
-  var chartoffset = 65;
-  
-  // Global vars
-  var paymin, paymax, dvmin, dvmax, minTWR, TWRref, gloc, maxengines, atmpres;
-  var payrange, dvrange, paystep, dvstep, recallCache, recallIdx;
-  var dvdecs, paydecs, nx, ny, engines, allEngines;
-  var heatmap, tickSymbol, gridlineSymbol, chartbox, chartboxPath, mousebox, lastpos;
-  var zoombox, zoomstart, zoomStarted, panstart, mapstart, panStarted;
-  var hairlineH, hairlineV, detailsLocked;
-  var chartLayer, colorkeyLayer;
-  var tic, toc;
-
-  // Standard gravity
-  g0 = 9.80655;
-
-  // Local surface gravity for all celestial bodies
-  surfgrav = {"Kerbin":g0, "Mun":1.63, "Minmus":0.491, "Duna":2.94 , "Ike":1.10, "Eve":16.7, "Gilly":0.049, "Moho":2.70, "Dres":1.13, "Jool":7.85, "Laythe":7.85, "Vall":2.31, "Tylo":7.85, "Bop":0.589, "Pol":0.373, "Eeloo":1.69}
-  
-  /*==============================================*/
-  
+ 
   // Add canvas to global scope
   paper.install(window);
 
@@ -151,38 +128,16 @@ see http://glyphicons.com/license/ for more information.
     recallIdx = -1;
     
     paper.view.draw();
-    
-    // Load engine definitions
-    // Updated for KSP 1.0.5
-    allEngines = [
-      new Engine("LV-909", "Terrier", 0.5, 60, [[0,345], [1,85], [3,0.001]], 8),
-      new Engine("LV-T30", "Reliant", 1.25, 215, [[0,300], [1,280], [7,0.001]], 8),
-      new Engine("LV-T45", "Swivel", 1.5, 200, [[0,320], [1,270], [6,0.001]], 8),
-      new Engine("T-1", "Aerospike", 1, 180, [[0,340], [1,290], [5,230], [10,170], [20,0.001]], 8),
-      new Engine("LV-N", "Nerv", 3, 60, [[0,800], [1,185], [2,0.001]], 7),
-      new Engine("Mk-55", "Thud", 0.9, 120, [[0,305], [1,275], [9,0.001]], 8),
-      new Engine("CR-7", "RAPIER", 2, 180, [[0,305], [1,275], [9,0.001]], 8),
-      new Engine("RE-L10", "Poodle", 1.75, 250, [[0,350], [1,90], [3,0.001]], 8),
-      new Engine("RE-I5", "Skipper", 3, 650, [[0,320], [1,280], [6,0.001]], 8),
-      new Engine("RE-M3", "Mainsail", 6, 1500, [[0,310], [1,285], [9,0.001]], 8),
-      new Engine("KR-2L", "Rhino", 9, 2000, [[0,340], [1,255], [5,0.001]], 8),
-      new Engine("KS-25x4", "Mammoth", 15, 4000, [[0,315], [1,295], [12,0.001]], 8),
-      new Engine("KR-1x2", "Twin Boar", 6.5, 2000, [[0,300], [1,280], [9,0.001]], 8),
-      new Engine("LV-1", "Ant", 0.02, 2, [[0,315], [1,80], [3,0.001]], 8),
-      new Engine("LV-1R", "Spider", 0.02, 2, [[0,290], [1,260], [8,0.001]], 8),
-      new Engine("24-77", "Twitch", 0.09, 16, [[0,290], [1,250], [7,0.001]], 8),
-      new Engine("48-7S", "Spark", 0.1, 18, [[0,300], [1,270], [7,0.001]], 8),
-      new Engine("O-10", "Puff", 0.09, 20, [[0,250], [1,120], [4,0.001]], 6),
-      new Engine("IX-6315", "Dawn", 0.25, 2, [[0,4200], [1,100], [1.2,0.001]], 8),
-      new Engine("KS-25", "Vector", 4, 1000, [[0,315], [1,295], [12,0.001]], 8)
-    ];
-    console.log(allEngines.length + " engines loaded");
-    console.log(allEngines);
-    
+  
     // Set colors to engines
     for (var i=0; i < allEngines.length; i++) {
       allEngines[i].color = palette[i%palette.length];
     }
+    console.log(allEngines.length + " engines loaded");
+    console.log(allEngines);
+
+    // Default fixed var
+    setFixedVar("payload");
 
     console.log("Ready.");
 
@@ -192,1307 +147,10 @@ see http://glyphicons.com/license/ for more information.
   $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip(); 
   });
- 
-  /*==============================================*/
-  
-  // Engine class
-  var Engine = function (name, nickname, mass, vac_thrust, Isp_points, alpha) {
-    this.name = name;
-    this.nickname = nickname;
-    if (name == "DawnSP") {
-      this.fullname = '"Dawn" + panels';
-    } else {
-      this.fullname = name + ' "' + nickname + '"';    
-    }
-    this.mass = mass;       // t
-    this.vac_thrust = vac_thrust;   // max vacuum thrust, kN
-    this.Isp_curve = new atmosphereCurve(Isp_points);   // Isp in s, P in atm
-    this.vac_Isp = this.Isp_curve.evaluate(0);
-    this.alpha = alpha;        // propellant-to-dry mass ratio
-    this.thrust = this.vac_thrust;
-    this.Isp = this.vac_Isp;
-    this.TWR = this.vac_thrust/(this.mass*g0);
-    this.color = [255,255,255];
-    this.show = false;
-    this.update = function (pressure, glocal) {
-      this.Isp = this.Isp_curve.evaluate(pressure);
-      this.thrust = this.vac_thrust*this.Isp/this.vac_Isp;
-      this.TWR = this.thrust/(this.mass*glocal);
-    };
-  };
-
-  /*==============================================*/
-  
-  // Spline curve for atmospheric Isp values
-  // Uses a Hermite cubic spline
-  var atmosphereCurve = function (points) {
-  
-    this.x = [];
-    this.y = [];
-    for (var i=0; i < points.length; i++) {
-      this.x.push(points[i][0]);
-      this.y.push(points[i][1]);
-    }
-    this.num = points.length;
-    
-    // Compute tangents
-    var last = this.num-1;
-    this.m = [];
-    for (var i=0; i < this.num; i++) {
-      if (i == 0) {
-        this.m.push((this.y[1]-this.y[0])/(this.x[1]-this.x[0]));
-      } else if (i == last) {
-        this.m.push((this.y[last]-this.y[last-1])/(this.x[last]-this.x[last-1]));
-      } else {
-        this.m.push(0.5*((this.y[i+1]-this.y[i])/(this.x[i+1]-this.x[i])+(this.y[i]-this.y[i-1])/(this.x[i]-this.x[i-1])));
-      }
-    }
-    
-    // Evaluate the curve for some value x
-    this.evaluate = function (x) {
-      // Determine the segment
-      var last = this.num-1;
-      var k;
-      if (x < this.x[0]) {
-        k = 0;
-      } else if (x > this.x[last]) {
-        k = last-1;
-      } else {
-        for (var i=0; i < last; i++) {   // linear search at the moment
-          if ((x >= this.x[i]) && (x <= this.x[i+1])) {
-            k = i;
-            break;
-          }
-        }
-      }
-      // Evaluate the Hermite spline
-      var t = (x-this.x[k])/(this.x[k+1]-this.x[k]);
-      return (2*t*t*t-3*t*t+1)*this.y[k] + (t*t*t-2*t*t+t)*(this.x[k+1]-this.x[k])*this.m[k] + (-2*t*t*t+3*t*t)*this.y[k+1] + (t*t*t-t*t)*(this.x[k+1]-this.x[k])*this.m[k+1];
-    };
-  };
-
-  /*==============================================*/
-
-  // Calculations
-  
-  // Number of engines needed to satisfy TWR restriction
-  function calc_numengines (engine, payload, dv, minTWR) {
-    if (minTWR == 0) {
-      return 1;
-    } else {
-      var A = engine.TWR/minTWR*((engine.alpha+1)*Math.exp(-dv/(engine.Isp*g0))-1);
-      if (A > engine.alpha) {
-        return Math.ceil((engine.alpha*payload/engine.mass)/(A-engine.alpha));
-      } else {
-        return NaN;
-      }
-    }
-  }
-
-   // Maximum dv for a given minTWR
-  function calc_maxdv (engine, minTWR) {
-    maxdv = engine.Isp*g0*Math.log((1.0+engine.alpha)/(1.0+engine.alpha*minTWR/engine.TWR));
-    if (maxdv > 0) {
-      return maxdv;
-    } else  {
-      return NaN;
-    }
-  }
-  
-  // Optimal mass for an engine, payload and dv combination, subject to 
-  // restrictions on the final TWR and the number of engines
-  // Returns the list [optimal mass, engines number]
-  function calc_mass (engine, payload, dv, minTWR, maxengines) {
-    if (dv > calc_maxdv (engine, minTWR)) {
-      return [NaN, NaN];
-    } else {
-      numengines = calc_numengines (engine, payload, dv, minTWR);
-      if (isNaN(numengines) || ((maxengines > 0) && (numengines > maxengines))) {
-        return [NaN, NaN];
-      } else {
-        mass = (engine.alpha*(payload+numengines*engine.mass))/((engine.alpha+1)*Math.exp(-dv/(engine.Isp*g0))-1.0);
-        return [mass, numengines];
-      }
-    }
-  }
-  
-  // Computes the burntime for dv given the parameters
-  function burntime (totthrust, totmass, veff, maxdv, dv) {
-    if (dv <= maxdv) return totmass/totthrust*veff*(1-Math.exp(-dv/veff));
-    else return NaN;
-  }
-
-  // Calls calc_mass to obtain total mass and number of engines, but also
-  // computes other stuff like acceleration, burn times, etc.
-  function fullAnalysis (engine, payload, dv, minTWR, maxengines) {
-    
-    var result = calc_mass(engine, payload, dv, minTWR, maxengines);
-    var totmass = result[0];
-    var numengines = result[1];
-    var payfrac = payload/totmass;
-    var totthrust = numengines*engine.thrust;
-    var engmass = numengines*engine.mass;
-    var tankmass = (totmass-payload-engmass)/(engine.alpha+1)
-    var propmass = engine.alpha*tankmass;
-    var minaccel = totthrust/totmass;
-    var maxaccel = totthrust/(totmass-propmass);
-    var actualdv = engine.Isp*g0*Math.log(totmass/(totmass-propmass));
-    var mdot = totthrust/(engine.Isp*g0);   // in t/s
-    var burnouttime = propmass/mdot;
-    var avgaccel = actualdv/burnouttime;
-    var veff = engine.Isp*g0;
-    var burntime100 = burntime(totthrust, totmass, veff, actualdv, 100);
-    var burntime200 = burntime(totthrust, totmass, veff, actualdv, 200);
-    var burntime500 = burntime(totthrust, totmass, veff, actualdv, 500);
-    var burntime1000 = burntime(totthrust, totmass, veff, actualdv, 1000);
-    return [engine, totmass, numengines, payfrac, minaccel, avgaccel, maxaccel, burnouttime, propmass, tankmass, engmass, burntime100, burntime200, burntime500, burntime1000];
-    
-  }  
-  
-  // A wrapper that computes the best engine for a grid of payload,dv values
-  // and returns an ImageData object with the results
-  // This makes the calculation faster since expensive computations are memoized
-  function calc_best_grid (engines, dvmin, dvmax, paymin, paymax) {
-
-    var result, totmass, best, minmass, numengines;
-    var x, y, i, R, G, B;
-  
-    // Reset engine shown flags and compute max dv for this min TWR
-    for (i=0; i < engines.length; i++) {
-      engines[i].show = false;
-      engines[i].maxdv = calc_maxdv (engines[i], minTWR);
-    }
-
-    // Create ImageData to store results
-    var result = heatmap.createImageData(new Size(nx,ny));
-
-    for (x=0; x < nx; x++) {
-      dv = x/nx*dvrange+dvmin;
-
-      // Compute terms that depend on dv only, not on payload
-      for (i=0; i < engines.length; i++) {
-        engines[i].dvterm = (engines[i].alpha+1)*Math.exp(-dv/(engines[i].Isp*g0))-1.0;
-        if (minTWR > 0) {
-          engines[i].nengterm = engines[i].TWR/minTWR*engines[i].dvterm;
-        }
-      }
-
-      for (y=0; y < ny; y++) {
-        payload = (ny-y)/ny*payrange+paymin;
-
-        // Compute masses for all engines and determine best
-        best = -1;
-        minmass = 1e30;
-        for (i=0; i < engines.length; i++) {
-          if (dv < engines[i].maxdv) {
-
-            // Compute numengines
-            if (minTWR == 0) {
-              numengines = 1;
-            } else if (engines[i].nengterm > engines[i].alpha) {
-              numengines = Math.ceil((engines[i].alpha*payload/engines[i].mass)/(engines[i].nengterm-engines[i].alpha));
-            } else {
-              continue;
-            }
-            if ((maxengines > 0) && (numengines > maxengines)) continue;
-            
-            // Compute total mass
-            totmass = engines[i].alpha*(payload+numengines*engines[i].mass)/engines[i].dvterm;
-            if (isNaN(totmass)) continue;
-
-            // Save if better than current
-            if (totmass < minmass) {
-              best = engines[i];
-              minmass = totmass;
-            }
-            
-          }
-        }
-
-        // Color cell according to best engine
-        if (best == -1) {
-          R = 255;
-          G = 255;
-          B = 255;
-        } else {
-          R = best.color[0];
-          G = best.color[1];
-          B = best.color[2];
-          best.show = true;
-        }
-        loc = 4 * (x + nx*y);
-        result.data[loc] = R;
-        result.data[loc+1] = G;
-        result.data[loc+2] = B;
-        result.data[loc+3] = 255;
-      
-      }
-    }
-
-    return result;
-
-  }  
-  
-  /*==============================================*/ 
-  
-  // Details panel
-  
-  // Converts a canvas pixel coordinate to (payload,dv)
-  function convertCoords (x, y) {
-    var dv = (x-chartbox.left)/mapx*dvrange + dvmin;
-    dv = Math.max(dv, 0);
-    var pay = (chartbox.bottom-y)/mapy*payrange + paymin;
-    pay = Math.max(pay, 0);
-    return [dv, pay];
-  }
-
-  // Comparator to sort results of compareEngines
-  function comparator (a,b) {
-    if (isNaN(a[1]) && isNaN(b[1])) {
-      return 0;
-    } else if (isNaN(a[1])) {
-      return 1;
-    } else if (isNaN(b[1])) {
-      return -1;      
-    } else {
-      return a[1]-b[1];
-    }
-  }
-  
-  // Computes analysis and sorts for given payload, dv, minTWR and engines list
-  function compareEngines (payload, dv, minTWR, engines) {
-    var optimal;
-    var results = [];
-    for (var i=0; i < engines.length; i++) {
-      fulldetails = fullAnalysis(engines[i], payload, dv, minTWR, maxengines);
-      results.push(fulldetails);
-    }
-    results.sort(comparator);
-    return results;
-  }
-
-  // Outputs a nicely formatted string given a time in seconds 
-  function nicetime (time) {
-    if (isNaN(time)) {
-      return "&ndash;";
-    } else {
-      var years, days, hours, mins, secs;
-      var buf = "";
-      if (time >= 31557600) {
-        years = Math.floor(time/31557600);
-        time = time - years*31557600;
-        buf += years + " yr ";
-      }
-      if (time >= 86400) {
-        days = Math.floor(time/86400);
-        time = time - days*86400;
-        buf += days + " d ";        
-      }
-      if (time >= 3600) {
-        hours = Math.floor(time/3600);
-        time = time - hours*3600;
-        buf += hours + " h ";        
-      }
-      if (time >= 60) {
-        mins = Math.floor(time/60);
-        time = time - mins*60;
-        buf += mins + " m ";        
-      }
-      buf += Math.round(time) + " s";
-      return buf;
-    }
-  }
-
-  function updateDetailsTitle () {
-
-    $('#lblMinTWR').text(minTWR + " (" + TWRref + ")");
-    if (atmpres > 0) {
-      if (["Kerbin","Duna","Eve","Laythe"].indexOf($('#atmpresetsmenu').val()) >= 0) {
-        titletext = atmpres.toString() + " atm (" + $('#atmpresetsmenu').val() + ")";
-      } else {
-        titletext = atmpres.toString() + " atm";
-      }      
-      $('#lblPressure').text(atmpres.toString() + " atm");
-    } else {
-      titletext = "vacuum";
-    }
-    $('#lblPressure').text(titletext);    
-
-  }
-
-  // Update details panel for given payload, dv
-  function updateDetails (dv, payload) {
-
-    updateDetailsTitle();
-    
-    $('#lblPayload').text(payload.toFixed(1) + " t");
-    $('#lblDeltav').text(dv.toFixed(0) + " m/s");
-    results = compareEngines (payload, dv, minTWR, engines);
-    
-    var buf1, buf2;
-    if (isNaN(results[0][1])) {
-      buf1 = "No solution";
-      buf2 = "";
-    } else {
-      buf1 = "Best: " + results[0][0].fullname + " \u00D7 " + results[0][2];
-      buf2 = results[0][1].toFixed(2) +  " t";
-    }
-    $('#lblBestEngine').text(buf1);
-    $('#lblBestMass').text(buf2);
-    $('#lblBestPayFrac').text((results[0][3]*100).toFixed(1)+"%");
-    $('#lblBestBurnoutTime').text((results[0][7]).toFixed(1)+" s");
-    $('#lblBestMinAccel').text((results[0][4]).toFixed(1));
-    $('#lblBestAvgAccel').text((results[0][5]).toFixed(1));
-    $('#lblBestMaxAccel').text((results[0][6]).toFixed(1));
-    $('#lblBestPayMass').text(payload.toFixed(1));
-    $('#lblBestPropMass').text((results[0][8]).toFixed(1));
-    $('#lblBestTankMass').text((results[0][9]).toFixed(1));
-    $('#lblBestEngMass').text((results[0][10]).toFixed(1));
-    $('#lblBestBurnTime1').html(nicetime(results[0][11]));
-    $('#lblBestBurnTime2').html(nicetime(results[0][12]));
-    $('#lblBestBurnTime3').html(nicetime(results[0][13]));
-    $('#lblBestBurnTime4').html(nicetime(results[0][14]));
-    
-    if (isNaN(results[1][1])) {
-      buf1 = "No solution";
-      buf2 = "";
-    } else {
-      buf1 = "Runner-up: " + results[1][0].fullname + " \u00D7 " + results[1][2];
-      buf2 = results[1][1].toFixed(2) +  " t";
-    }
-    $('#lblRunnerupEngine').html(buf1);
-    $('#lblRunnerupMass').html(buf2);
-    $('#lblRunnerupPayFrac').text((results[1][3]*100).toFixed(1)+"%");
-    $('#lblRunnerupBurnoutTime').text((results[1][7]).toFixed(1)+" s");
-    $('#lblRunnerupMinAccel').text((results[1][4]).toFixed(1));
-    $('#lblRunnerupAvgAccel').text((results[1][5]).toFixed(1));
-    $('#lblRunnerupMaxAccel').text((results[1][6]).toFixed(1));
-    $('#lblRunnerupPayMass').text(payload.toFixed(1));
-    $('#lblRunnerupPropMass').text((results[1][8]).toFixed(1));
-    $('#lblRunnerupTankMass').text((results[1][9]).toFixed(1));
-    $('#lblRunnerupEngMass').text((results[1][10]).toFixed(1));
-    $('#lblRunnerupBurnTime1').html(nicetime(results[1][11]));
-    $('#lblRunnerupBurnTime2').html(nicetime(results[1][12]));
-    $('#lblRunnerupBurnTime3').html(nicetime(results[1][13]));
-    $('#lblRunnerupBurnTime4').html(nicetime(results[1][14]));
-
-  }
-  
-  // Clears the details panel
-  function clearDetails () {
-  
-    var toClear = ["lblPayload", "lblDeltav", "lblBestMass", "lblBestPayFrac", "lblBestBurnoutTime", "lblBestMinAccel", "lblBestAvgAccel", "lblBestMaxAccel", "lblBestPayMass", "lblBestPropMass", "lblBestTankMass", "lblBestEngMass", "lblBestBurnTime1", "lblBestBurnTime2", "lblBestBurnTime3", "lblBestBurnTime4", "lblRunnerupMass", "lblRunnerupPayFrac", "lblRunnerupBurnoutTime", "lblRunnerupMinAccel", "lblRunnerupAvgAccel", "lblRunnerupMaxAccel", "lblRunnerupPayMass", "lblRunnerupPropMass", "lblRunnerupTankMass", "lblRunnerupEngMass", "lblRunnerupBurnTime1", "lblRunnerupBurnTime2", "lblRunnerupBurnTime3", "lblRunnerupBurnTime4"];
-    for (var i=0; i < toClear.length; i++) {
-      $('#'+toClear[i]).html("&nbsp;");
-    }
-    $("#lblBestEngine").html("Best");
-    $("#lblRunnerupEngine").html("Runner-up");
-  
-  }
-  
-  /*==============================================*/ 
-  
-  // Mouse box interactions
-    
-  // Fill details panel for point under mouse (if within mousebox bounds)
-  function mouseboxOnMouseMove (event) {
-  
-    if (!detailsLocked) {
-
-      if (typeof engines != 'undefined' && chartbox.contains(event.point)) {
-        var coords = convertCoords (event.point.x, event.point.y);
-        updateDetails(coords[0], coords[1]);    
-      } else {
-        clearDetails();
-      }
-
-    }
-    lastpos = event.point;
-    
-  }
-  
-  // Clear details and zoombox (if any)
-  function mouseboxOnMouseEnter(event) {
-
-/*
-     clearDetails();
-     if (zoombox) {
-       zoombox.remove();
-       zoombox = null;
-     }
-     if (panStarted) {
-       heatmap.position = mapstart;
-     }
-     zoomStarted = false;
-     panStarted = false;
-     console.log("Entered mousebox");
-*/
-   
-  }
-  
-  function mouseboxOnMouseLeave(event) {
-
-  }
-   
-  function mouseboxOnClick (event) {
-  
-
-  }
-  
-  // Update zoombox or panned view
-  function mouseboxOnMouseDrag (event) {
- 
-    hairlineH.visible = false;
-    hairlineV.visible = false;
-    detailsLocked = false;
-    document.getElementById("lockedTooltip").style.visibility = "hidden";    
- 
-    if (!zoomStarted && !panStarted && chartbox.contains(event.point)) {
-
-      if (event.modifiers.control) {
-        zoombox = new Shape.Rectangle(event.point.x, event.point.y, 0, 0);
-        zoombox.insertBelow(mousebox);
-        zoomstart = new Point(event.point);      
-        zoomStarted = true;
-        console.log("zoombox started");
-      } else {
-        panstart = new Point(event.point);
-        mapstart = heatmap.position;
-        panStarted = true;
-        console.log("pan started");        
-      }
-
-    }
- 
-    if (zoomStarted) {
-
-      var x0 = Math.max(Math.min(event.point.x,zoomstart.x),chartbox.left);
-      var y0 = Math.max(Math.min(event.point.y,zoomstart.y),chartbox.top);
-      var x1 = Math.min(Math.max(event.point.x,zoomstart.x),chartbox.right);
-      var y1 = Math.min(Math.max(event.point.y,zoomstart.y),chartbox.bottom);
-      var dx = Math.abs(x0-x1);
-      var dy = Math.abs(y0-y1);
-      var newsize = new Size(dx,dy);
-      var newpos = new Point(x0+dx/2,y0+dy/2);
-      zoombox.set({
-        strokeColor: 'black',
-        dashArray: [5, 3],
-        position: newpos,
-        size: newsize
-      });
-
-    } else if (panStarted) {
-
-      var dx = event.point.x - panstart.x;
-      var dy = event.point.y - panstart.y;
-      var dxmax = dvmin/dvrange*mapx;
-      if (dx > dxmax) {
-        dx = dxmax;
-        panstart.x = event.point.x - dx;
-      }
-      var dymin = -paymin/payrange*mapy;
-      if (dy < dymin) {
-        dy = dymin;
-        panstart.y = event.point.y - dy;
-      }
-      heatmap.position = new Point(mapstart.x+dx, mapstart.y+dy);
-
-    }
-    
-  }
-  
-  // Freeze details
-  function mouseboxOnMouseUp (event) {
-    
-    if (chartbox.contains(event.point)) {
-      if (detailsLocked) {
-        hairlineH.visible = false;
-        hairlineV.visible = false;
-        detailsLocked = false;
-        document.getElementById("lockedTooltip").style.visibility = "hidden";
-      } else {
-        hairlineH = new Path.Line(new Point(chartbox.left,event.point.y), new Point(chartbox.right,event.point.y));
-        hairlineH.strokeColor = "black";
-        hairlineH.strokeWidth = 1;
-        hairlineV = new Path.Line(new Point(event.point.x,chartbox.top), new Point(event.point.x,chartbox.bottom));
-        hairlineV.strokeColor = "black";
-        hairlineV.strokeWidth = 1;
-        detailsLocked = true;
-        document.getElementById("lockedTooltip").style.visibility = "visible";        
-      }
-    }
-  
-  }
-
-  // Adds a mouseup listener to the whole document to execute
-  // mouse interaction even outside the canvas
-  document.addEventListener("mouseup", function(){
-    if (zoomStarted) executeZoombox(lastpos);
-    else if (panStarted) executePanview();     
-  });
- 
-  
-  // Executes the zoombox zoom
-  function executeZoombox (point) {
-    var x1 = Math.min(point.x, zoomstart.x);
-    var y1 = Math.max(point.y, zoomstart.y);
-    var x2 = Math.max(point.x, zoomstart.x);
-    var y2 = Math.min(point.y, zoomstart.y);
-    var newmin = convertCoords(x1, y1);
-    var newmax = convertCoords(x2, y2);
-    console.log("new pay range:", newmin[1], newmax[1]);
-    console.log("new dv range:", newmin[0], newmax[0]);
-    setRanges(newmin[1], newmax[1], newmin[0], newmax[0]);
-    storeSettings();
-    plot_chart();
-    zoombox.remove();
-    zoombox = null
-    zoomStarted = false;
-    detailsLocked = false;
-    document.getElementById("lockedTooltip").style.visibility = "hidden";    
-  }
-  
-  // Executes the view panning
-  function executePanview () {
-    var dx = heatmap.position.x-mapstart.x;
-    var dy = heatmap.position.y-mapstart.y;
-    var newdvmin = Math.max(dvmin-dx/mapx*dvrange, 0);
-    var newdvmax = dvmax-dx/mapx*dvrange;        
-    var newpaymin = Math.max(paymin+dy/mapy*payrange, 0);
-    var newpaymax = paymax+dy/mapy*payrange;
-    console.log("new dv range:", newdvmin, newdvmax);
-    console.log("new pay range:", newpaymin, newpaymax);
-    setRanges(newpaymin, newpaymax, newdvmin, newdvmax);
-    storeSettings();
-    plot_chart();
-    panStarted = false;
-    detailsLocked = false;
-    document.getElementById("lockedTooltip").style.visibility = "hidden";
-  }
-  
-  /*==============================================*/ 
-  
-  // Settings recall
-  
-  // Insert settings at current idx, removing those after it
-  function storeSettings() {
-    recallCache = recallCache.slice(0,recallIdx+1);
-    recallCache.push([paymin,paymax,dvmin,dvmax]);
-    recallIdx += 1;
-    updateRecallBtns();
-  }
-  
-  function updateRecallBtns () {
-   if (recallCache.length > 1) {
-      if (recallIdx == recallCache.length-1) {
-        $('#recallBack').prop('disabled', false);
-        $('#recallForward').prop('disabled', true);
-      } else if (recallIdx == 0) {
-        $('#recallBack').prop('disabled', true);
-        $('#recallForward').prop('disabled', false);      
-      } else {
-        $('#recallBack').prop('disabled', false);
-        $('#recallForward').prop('disabled', false);      
-      }
-    } else {
-      $('#recallBack').prop('disabled', true);
-      $('#recallForward').prop('disabled', true); 
-    }
-  }
-  
-  // Recall previous ranges
-  function recallSettings(direction) {
-  
-    var newIdx = recallIdx + direction;
-    if (newIdx >= 0 && newIdx < recallCache.length) {
-      setRanges(recallCache[newIdx][0], recallCache[newIdx][1], recallCache[newIdx][2], recallCache[newIdx][3]);
-      plot_chart();
-      recallIdx = newIdx;
-      updateRecallBtns();
-    }
-
-
-  }
-
-  /*==============================================*/ 
-
-  // Zoom buttons
-
-  function zoomAction(direction,variable) {
-  
-    if (direction == "in") zoomfactor = 0.5;
-    else if (direction == "out") zoomfactor = 2.0;
-
-    if (variable == "payload") {
-      var newpayrange = payrange*zoomfactor;
-      var newpaymin = (paymin+paymax)/2 - newpayrange/2;
-      newpaymin = Math.max(0,newpaymin);
-      var newpaymax = newpaymin + newpayrange;
-      setRanges(newpaymin, newpaymax, dvmin, dvmax);
-    } else if (variable == "dv") {
-      var newdvrange = dvrange*zoomfactor;
-      var newdvmin = (dvmin+dvmax)/2 - newdvrange/2;
-      newdvmin = Math.max(0,newdvmin);
-      var newdvmax = newdvmin + newdvrange;
-      setRanges(paymin, paymax, newdvmin, newdvmax);
-    }
-    storeSettings();
-    plot_chart();
-
-  }  
-  
-  /*==============================================*/ 
-/*  
-  // Zoom buttons interactions
-  
-  function zoomInBoxOnMouseEnter (event) { 
-//    console.log("entered zoom in button");
-  }
-  
-  function zoomInBoxOnMouseLeave (event) { 
-//    console.log("left zoom in button");
-  }  
-
-  function zoomInBoxOnClick (event) { 
-    var newdvmin = dvmin + dvrange/4;
-    var newdvmax = dvmax - dvrange/4;
-    var newpaymin = paymin + payrange/4;
-    var newpaymax = paymax - payrange/4;
-    console.log("new pay range:", newpaymin, newpaymax);
-    console.log("new dv range:", newdvmin, newdvmax);
-    setRanges (newpaymin, newpaymax, newdvmin, newdvmax);
-    plot_chart();
-  }
-
-  function zoomOutBoxOnMouseEnter (event) { 
-//    console.log("entered zoom out button");
-  }
-  
-  function zoomOutBoxOnMouseLeave (event) { 
-//    console.log("left zoom out button");
-  }
-  
-  function zoomOutBoxOnClick (event) { 
-    var newdvmin = Math.max((dvmin - dvrange/4), 0);
-    var newdvmax = dvmax + dvrange/4;
-    var newpaymin = Math.max((paymin - payrange/4), 0);
-    var newpaymax = paymax + payrange/4;
-    console.log("new pay range:", newpaymin, newpaymax);
-    console.log("new dv range:", newdvmin, newdvmax);
-    setRanges (newpaymin, newpaymax, newdvmin, newdvmax);
-    plot_chart();
-  }  
-*/ 
-  /*==============================================*/ 
-  
-  // Form input interactions
-
-  // Check/uncheck all boxes in a group
-  // If not all checked, check all; if all checked, uncheck all.
-  function toggleboxes(groupname) {
-    checkboxes = document.getElementsByName(groupname);
-    var count = 0;
-    for (var i=0; i < checkboxes.length; i++) {
-      if (checkboxes[i].checked) count += 1;
-    }
-    var state = !(count == checkboxes.length);
-    for (var i=0; i < checkboxes.length; i++) {
-      checkboxes[i].checked = state;
-    }
-    $('#chkDawnSP').prop('disabled', !state);
-  }
-
-  // Loads an example set of parameters
-  function load_example () {
-    $('#payloadmin').val('0');
-    $('#payloadmax').val('20');
-    $('#dvmin').val('0');
-    $('#dvmax').val('5000');
-    $('#minTWR').val('0.5');
-    $('#TWRrefSelect').val("Kerbin");
-    $('#atmpres').val('0');
-    $('#atmpresetsmenu').val("vacuum");
-    $('#maxengines').val('50');
-    $('#unlimitedchkbox').prop('checked',false);
-    $('#maxengines').prop('disabled',false);
-    $('input[type=radio]').prop('checked', function () {
-        return this.getAttribute('checked') == 'checked';
-    });
-//    $('#useoldnamesChk').prop('checked',false);
-  }
-  
-  // Sets or unsets the "unlimited engines" checkbox and text input
-  function toggleunlimited () {
-    if ($('#unlimitedchkbox').prop("checked")) {
-      $('#maxengines').prop('disabled', true);
-    } else {
-      $('#maxengines').prop('disabled', false);
-    }
-  }
-  
-  // Sets the pressure from a clicked preset
-  function setAtmoPreset () {
-    selected = $('#atmpresetsmenu').find(":selected").val();
-    if (selected == "vacuum") {
-      $('#atmpres').val(0);
-    } else if (selected == "Kerbin") {
-      $('#atmpres').val(1.0);
-    } else if (selected == "Duna") {
-      $('#atmpres').val(0.2);    
-    } else if (selected == "Laythe") {
-      $('#atmpres').val(0.6);
-    } else if (selected == "Eve") {
-      $('#atmpres').val(5.0);
-    }
-  }
-  
-  // Updates the presets dropdown to the relevant option
-  function updateAtmoPresets () {
-    pres = $('#atmpres').val();
-    if (pres == 0) {
-      $('#atmpresetsmenu').val("vacuum");
-    } else if (pres == 1.0) {
-      $('#atmpresetsmenu').val("Kerbin");
-    } else if (pres == 0.2) {
-      $('#atmpresetsmenu').val("Duna");
-    } else if (pres == 0.6) {
-      $('#atmpresetsmenu').val("Laythe");
-    } else if (pres == 5.0) {
-      $('#atmpresetsmenu').val("Eve");
-    } else {
-      $('#atmpresetsmenu').val("custom");
-    }
-  }  
-  
-  // Enable/disable Dawn SP checkbox
-  function changeDawnChk () {
-    if ($('#chkIX-6315').prop("checked")) {
-      $('#chkDawnSP').prop('disabled', false);
-    } else {
-      $('#chkDawnSP').prop('disabled', true);
-    }
-  }
-  
-/*
-  // Toggle nicknames / old names
-  function toggleUseOldNames () {
-    useoldnames = $('#useoldnamesChk').prop("checked");
-    plot_color_key();
-    paper.view.draw()
-  }
-*/
-  
-  /*==============================================*/ 
- 
-  // Save image
-  function saveCanvas() {
-    document.getElementById("downloader").download = "image.png";
-    document.getElementById("downloader").href = document.getElementById("myCanvas").toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
-    console.log(document.getElementById("myCanvas").toDataURL("image/png"));
-  }
-  
-  /*==============================================*/
-
-  // Main input form
-  
-  // Parses and validates input form
-  function parseInput () {
- 
-    paymin = parseFloat($('#payloadmin').val());
-    if (isNaN(paymin) || (paymin < 0)) return false;
-    
-    paymax = parseFloat($('#payloadmax').val());
-    if ((isNaN(paymax)) || (paymax <= paymin)) return false;
-    
-    dvmin = parseFloat($('#dvmin').val());
-    if (isNaN(dvmin) || (dvmin < 0)) return false;
-    
-    dvmax = parseFloat($('#dvmax').val());
-    if ((isNaN(dvmax)) || (dvmax <= dvmin)) return false;
-    
-    minTWR = parseFloat($('#minTWR').val());
-    if ((isNaN(minTWR)) || (minTWR < 0)) return false;
-
-    TWRref = $('#TWRrefSelect').val();
-    gloc = surfgrav[TWRref];
-    if (!gloc) return false;
-    
-    atmpres = parseFloat($('#atmpres').val());
-    if (isNaN(atmpres)) return false;
-    
-    if ($('#unlimitedchkbox').prop("checked")) {
-      maxengines = 0;
-    } else {   
-      maxengines = parseFloat($('#maxengines').val());
-      if (isNaN(maxengines)) return false;
-    }
-
-    dvrange = dvmax - dvmin;
-    payrange = paymax - paymin;
-
-    // Load selected engines
-    engines = [];
-    for (var i=0; i < allEngines.length; i++) {
-      if ($('#chk'+allEngines[i].name).prop("checked")) {
-        // Add 100kg to mass of "Dawn" if SP checkbox checked
-        if (allEngines[i].name == "IX-6315") {
-          if ($('#chkDawnSP').prop('checked')) {
-            allEngines[i].mass = 0.35;
-            console.log("Adding 100kg of solar panels to Dawn engine");
-          } else {
-            allEngines[i].mass = 0.25;
-          }
-          allEngines[i].TWR = allEngines[i].vac_thrust/(allEngines[i].mass*g0);
-        }
-        engines.push(allEngines[i]);        
-      }
-    }
-    if (engines.length < 1) return false;
-    
-    // Adjust Isp, thrust and TWR of engines for given atmospheric pressure
-    // and local gravity
-    for (var i=0; i < engines.length; i++) {
-      engines[i].update(atmpres, gloc);
-    }
-
-    return true;  
-    
-  }
-  
-  // Sets the ranges, updating the input fields
-  function setRanges (newpaymin, newpaymax, newdvmin, newdvmax) {
-  
-    $('#payloadmin').val(newpaymin);
-    $('#payloadmax').val(newpaymax);
-    $('#dvmin').val(newdvmin);
-    $('#dvmax').val(newdvmax)
-    paymin = newpaymin;
-    paymax = newpaymax;
-    dvmin = newdvmin;
-    dvmax = newdvmax;
-    dvrange = newdvmax - newdvmin;
-    payrange = newpaymax - newpaymin;
-
-  }
-  
-  // Calculate button
-  function calculateButton () {
-
-    console.log("------------------------");
-  
-    var valid = parseInput();
-    if (valid) {
-      recallCache.splice(0,recallCache.length);
-      recallIdx = -1;
-      storeSettings();
-      updateRecallBtns();
-      plot_chart();
-      updateDetailsTitle();
-    } else {
-      console.log("INVALID INPUT!");
-    }
-  
-  }  
-
-  /*==============================================*/
-  
-  // Plots the color key
-  function plot_color_key () {
-  
-    // Clear current color key and set it to be the active layer
-    colorkeyLayer.removeChildren();
-    colorkeyLayer.activate();
-    
-    var toshow = [];
-    for (var i=0; i < engines.length; i++) {
-      if (engines[i].show) toshow.push(engines[i]);
-    }
-    keywidth = 30;
-    keyheight = keywidth*toshow.length;
-    var originx = chartbox.right+15;
-    var originy = chartbox.top;
-    var keytopleft = new Point(originx, originy);
-    for (var i=0; i < toshow.length; i++) {
-    
-      var keyelem = new Path.Rectangle(new Rectangle(new Point(originx,originy+i*keywidth), keywidth, keywidth));
-      //keyelem.strokeColor = "black";
-      c = toshow[i].color;
-      keyelem.fillColor = new Color(c[0]/255,c[1]/255,c[2]/255);
-      
-      var label = new PointText({
-      point: [originx+keywidth*1.3, originy+i*keywidth+fontSize*1.2],
-      justification: 'left',
-      fillColor: 'black',
-      content: toshow[i].fullname,
-      fontSize: fontSize-3
-      });
-      //content: useoldnames ? toshow[i].name : toshow[i].nickname,
-      
-    }
-    var keybox = new Path.Rectangle(new Rectangle(keytopleft, keywidth, keyheight));
-    keybox.strokeColor = "black";
-
-  }
-
-  /*==============================================*/  
-  
-  // Plots the engine chart
-  function plot_chart () {
-  
-    //tic = performance.now();   // not supported by Safari
-    tic = Date.now();
-  
-    console.log("Payload range:", paymin, "-", paymax, "t");
-    console.log("Delta-v range:", dvmin, "-", dvmax, "m/s");
-    console.log("Minimum TWR:", minTWR);
-    console.log("TWR reference:", TWRref);
-    console.log("Atmospheric pressure:", atmpres, "atm");
-    console.log("Maximum engines:", maxengines);
-    console.log(engines.length + " engines selected:");
-    console.log(engines);
-
-    // Number of grid points
-    quality = $("input[type='radio'][name='quality']:checked").val();
-    if (quality == "high") {
-      nx = 500;
-      ny = 500;
-      scaling = 1.0;
-    } else {
-      nx = 200;
-      ny = 200;
-      scaling = 2.5;
-    }
-
-    // Clear chart layer and activate it
-    chartLayer.removeChildren();
-    chartLayer.activate();
-          
-    // Re-add chart box
-    project.activeLayer.addChild(chartboxPath);
-    
-    toc = Date.now();
-    console.log("Initializations: " + ((toc-tic)>=1 ? (toc-tic) : "< 1") + " ms");
-    tic = Date.now();
-    
-    // xtics (dv)
-    var steps = [10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10];
-    for (var i=0; i < steps.length; i++) {
-      ints = dvrange/steps[i];
-      if ((ints >= 4) && (ints <= 9)) {
-        dvstep = steps[i];
-        break;
-      }
-    }
-//    var dv = dvstep;
-    var dv = Math.floor((dvmin+dvstep)/dvstep)*dvstep;
-    if ((dv-dvmin) < dvstep/3) dv = dv+dvstep;    
-    while (dvmax-dv >= dvstep/3) {
-      x = chartbox.left + (dv-dvmin)/(dvrange)*mapx;
-      var tick = tickSymbol.place()
-      tick.position = new Point(x, chartbox.bottom-ticklength/2);
-      var tick = tickSymbol.place()
-      tick.position = new Point(x, chartbox.top+ticklength/2);
-      var gridline = gridlineSymbol.place()
-      gridline.position = new Point(x, chartbox.center.y);
-      var ticklabel = new PointText({
-        point: [x, chartbox.bottom+tickLabelPad],
-        content: dv.toFixed(0),
-        fontSize: fontSize,
-        justification: 'center'
-      });
-      dv += dvstep;
-    }
-    var ticklabel = new PointText({
-      point: [chartbox.left, chartbox.bottom+tickLabelPad],
-      content: dvmin.toFixed(0),
-      fontSize: fontSize,
-      justification: 'center'
-    });
-    var ticklabel = new PointText({
-      point: [chartbox.right, chartbox.bottom+tickLabelPad],
-      content: dvmax.toFixed(0),
-      fontSize: fontSize,
-      justification: 'center'
-    });
-
-    // ytics (payload)
-    steps = [1000, 500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05];
-    for (var i=0; i < steps.length; i++) {
-      ints = payrange/steps[i];
-      if ((ints >= 4) && (ints <= 8)) {
-        paystep = steps[i];
-        break;
-      }
-    }
-    var pay = Math.floor((paymin+paystep)/paystep)*paystep;
-    if ((pay-paymin) < paystep/4) pay = pay+paystep;
-    var paydecs = paystep >= 1 ? 0 : 1;
-    while (paymax-pay >= paystep/4) {
-      y = chartbox.bottom - (pay-paymin)/(payrange)*mapy;
-      var tick = tickSymbol.place()
-      tick.rotate(90);
-      tick.position = new Point(chartbox.left+ticklength/2, y);
-      var tick = tickSymbol.place()
-      tick.rotate(90);
-      tick.position = new Point(chartbox.right-ticklength/2, y);
-      var gridline = gridlineSymbol.place()
-      gridline.rotate(90);
-      gridline.position = new Point(chartbox.center.x, y);
-      var ticklabel = new PointText({
-        point: [chartbox.left-tickLabelPad/3, y+fontSize/3],
-        content: pay.toFixed(paydecs),
-        fontSize: fontSize,
-        justification: 'right'
-      });
-      dv += dvstep;
-      pay += paystep;
-    }
-    var ticklabel = new PointText({
-      point: [chartbox.left-tickLabelPad/3, chartbox.top+fontSize/3],
-      content: paymax.toString().slice(0,5),
-      fontSize: fontSize,
-      justification: 'right'
-    });
-    var ticklabel = new PointText({
-      point: [chartbox.left-tickLabelPad/3, chartbox.bottom+fontSize/3],
-      content: paymin.toString().slice(0,5),
-      fontSize: fontSize,
-      justification: 'right'
-    });    
-
-    // x-axis label
-    
-    var xlabel = new PointText({
-      point: [chartbox.center.x, chartbox.bottom+tickLabelPad+2*fontSize],
-      justification: 'center',
-      fillColor: 'black',
-      content: '\u0394v [m/s]',
-      fontSize: fontSize+2
-    });
-    
-    // y-axis label
-    
-    var ylabel = new PointText({
-      point: [chartbox.left-tickLabelPad*2.7, chartbox.center.y],
-      justification: 'center',
-      fillColor: 'black',
-      content: 'Payload [tonnes]',
-      fontSize: fontSize+2,
-    });
-    ylabel.rotate(-90);
-    
-    // chart title
-    
-    var titletext;
-    if (minTWR == 0) titletext = "No TWR restriction";
-    else titletext = "Minimum " + TWRref + " TWR = " + minTWR.toString();
-    titletext += " @ ";
-    
-    if (atmpres > 0) {
-      if (["Kerbin","Duna","Eve","Laythe"].indexOf($('#atmpresetsmenu').val()) >= 0) {
-        titletext += atmpres.toString() + " atm (" + $('#atmpresetsmenu').val() + ")";
-      } else {
-        titletext += atmpres.toString() + " atm";
-      }
-    } else {
-      titletext += "vacuum";
-    }
-    var title = new PointText({
-      point: [chartbox.center.x, chartbox.top-tickLabelPad],
-      justification: 'center',
-      fillColor: 'black',
-      content: titletext,
-      fontSize: fontSize+2
-    });
-    
-    toc = Date.now();
-    console.log("Tick calculation: " + ((toc-tic)>=1 ? (toc-tic) : "< 1") + " ms");
-    tic = Date.now();
-
-    // Initialize heatmap
-    heatmap = new Raster();
-    heatmap.position = new Point(chartbox.center.x, chartbox.center.y);
-    heatmap.size = new Size(nx,ny);
-
-    if (false) {   // DEBUG -- SWITCH COMPUTATION METHOD
-
-    // Reset engine shown flags
-    for (i=0; i < engines.length; i++) {
-      engines[i].show = false;
-    }
-    
-    // Compute values
-    mapdata = heatmap.createImageData(new Size(nx,ny));
-    var result, mass, best, minmass;
-    var x, y, i, R, G, B;
-
-    for (x=0; x < nx; x++) {
-      dv = x/nx*dvrange+dvmin;
-      for (y=0; y < ny; y++) {
-        payload = (ny-y)/ny*payrange+paymin;
-        
-        // Compute masses individually and determine best engine only
-        best = -1;
-        minmass = 1e30;
-        for (i=0; i < engines.length; i++) {
-          result = calc_mass(engines[i], payload, dv, minTWR, maxengines);
-          mass = result[0];
-          if (!(isNaN(mass)) && mass < minmass) {
-            best = engines[i];
-            minmass = mass;
-          }
-        }
-
-        // Color cell according to best engine
-        if (best == -1) {
-          R = 255;
-          G = 255;
-          B = 255;
-        } else {
-          R = best.color[0];
-          G = best.color[1];
-          B = best.color[2];
-          best.show = true;
-        }
-        loc = 4 * (x + nx*y);
-        mapdata.data[loc] = R;
-        mapdata.data[loc+1] = G;
-        mapdata.data[loc+2] = B;
-        mapdata.data[loc+3] = 255;
-      }
-      /*
-      // Update progress bar
-      progress = Math.round((x+1)/nx*100);
-      $("#progressbar").width(progress + '%');
-      */
-    }
-
-    } else {
-    
-      mapdata = calc_best_grid (engines, dvmin, dvmax, paymin, paymax);
-    
-    }  
-  
-    toc = Date.now();
-    console.log("Chart computation: " + ((toc-tic)>=1 ? (toc-tic) : "< 1") + " ms");
-    tic = Date.now();
-
-    // Set data to heatmap and send to back
-    heatmap.setImageData(mapdata, new Point(0,0));
-    heatmap.sendToBack();
-    
-    // Scale to 500x500 resolution, if needed
-    scalecenter = new Point(chartbox.center.x, chartbox.center.y);
-    heatmap.scale(scaling, scalecenter);
-
-    // Add a clipping mask for the heatmap (for panning click-and-drag)
-    //if (dragBehavior == "pan") {
-      chartGroup = new Group();
-      clipMask = new Path.Rectangle(chartbox);
-      chartGroup.addChild(clipMask);
-      chartGroup.addChild(heatmap);
-      chartGroup.sendToBack();
-      chartGroup.clipped = true;
-    //}
-    
-    toc = Date.now();
-    console.log("Image loading and scaling: " + ((toc-tic)>=1 ? (toc-tic) : "< 1") + " ms");
-    tic = Date.now();
-
-    // Mouse box (to catch mouse events on top of drawn objects)
-    mousebox = new Shape.Rectangle(paper.view.bounds);
-    mousebox.fillColor = "white";
-    mousebox.strokeColor = new Color(1,0,0);
-    mousebox.opacity = 0.0;
-    mousebox.onMouseMove = mouseboxOnMouseMove;
-    mousebox.onMouseDrag = mouseboxOnMouseDrag;
-    mousebox.onClick = mouseboxOnClick;
-    mousebox.onMouseUp = mouseboxOnMouseUp;
-    mousebox.onMouseLeave = mouseboxOnMouseLeave;
-    mousebox.minDistance = 50;
-    console.log("created mousebox");
-    mousebox.bringToFront();
-    
-    // Create zoom buttons
-/*    
-    var rectangle = new Rectangle(new Point(chartbox.right-35, chartbox.top+10), new Size(25, 25));
-    var cornerSize = new Size(6, 6);
-    var zoominBtn = new Shape.Rectangle(rectangle, cornerSize);
-    zoominBtn.strokeColor = 'black';
-    zoominBtn.fillColor = '#e7e7e7';
-    zoominBtn.opacity = 0.8;
-    var x1 = zoominBtn.position.x;
-    var y1 = zoominBtn.position.y-8;
-    var y2 = zoominBtn.position.y+8;
-    var plussign1 = new Path.Line(new Point(x1,y1), new Point(x1,y2));
-    plussign1.strokeColor = 'black';
-    plussign1.strokeWidth = 3;
-    plussign1.opacity = 1.0;
-    var plussign2 = plussign1.clone();
-    plussign2.rotate(90);
-    var zoomInBox = new Shape.Rectangle(rectangle, cornerSize);
-    zoomInBox.fillColor = "white";
-    zoomInBox.opacity = 0.0;
-    zoomInBox.bringToFront();
-    zoomInBox.onMouseEnter = zoomInBoxOnMouseEnter;
-    zoomInBox.onMouseLeave = zoomInBoxOnMouseLeave;
-    zoomInBox.onClick = zoomInBoxOnClick;
-    
-    var rectangle = new Rectangle(new Point(chartbox.right-35, chartbox.top+40), new Size(25, 25));
-    var cornerSize = new Size(6, 6);
-    var zoomoutBtn = new Shape.Rectangle(rectangle, cornerSize);
-    zoomoutBtn.strokeColor = 'black';
-    zoomoutBtn.fillColor = '#e7e7e7';
-    zoomoutBtn.opacity = 0.8;
-    var x1 = zoomoutBtn.position.x-8;
-    var x2 = zoomoutBtn.position.x+8;
-    var y1 = zoomoutBtn.position.y;
-    var minussign = new Path.Line(new Point(x1,y1), new Point(x2,y1));
-    minussign.strokeColor = 'black';
-    minussign.strokeWidth = 3;
-    minussign.opacity = 1.0;  
-    var zoomOutBox = new Shape.Rectangle(rectangle, cornerSize);
-    zoomOutBox.fillColor = "white";
-    zoomOutBox.opacity = 0.0;
-    zoomOutBox.bringToFront();
-    zoomOutBox.onMouseEnter = zoomOutBoxOnMouseEnter;
-    zoomOutBox.onMouseLeave = zoomOutBoxOnMouseLeave;
-    zoomOutBox.onClick = zoomOutBoxOnClick;
-
-    toc = Date.now();
-    console.log("Zoom buttons: " + ((toc-tic)>=1 ? (toc-tic) : "< 1") + " ms");
-    tic = Date.now();
-*/
-    
-    // Plot color key
-    plot_color_key();
-
-    toc = Date.now();
-    console.log("Color key drawing: " + ((toc-tic)>=1 ? (toc-tic) : "< 1") + " ms");
-    tic = Date.now();
-    
-    // Make details and control panels visible
-    document.getElementById("detailspane").style.visibility = "visible";
-    document.getElementById("controls").style.visibility = "visible";    
-
-    detailsLocked = false;
-    document.getElementById("lockedTooltip").style.visibility = "hidden";
-
-    console.log("CHART COMPUTATION DONE");
-    
-    paper.view.draw()
-    
-    // smooth scroll to canvas using jquery
-    $('html, body').animate({
-        scrollTop: $("#myCanvas").offset().top
-    }, 400);
-
-   
-  }
-  
-  /*==============================================*/
 
 </script>
+
+<!---------------------------------------------------------------->
 
 </head>
 <body>
@@ -1511,16 +169,17 @@ see http://glyphicons.com/license/ for more information.
 
         <button class="btn btn-default btn-sm" type="button" data-toggle="collapse" data-target="#CharParametersHelp" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-question-sign" style="font-size: 18px;"></span></button>
 
+        <!-- Input tooltip -->
         <div class="collapse" id="CharParametersHelp">
           <br>
           <div class="well" style="font-size: 15px;">
             <h4>Basic Instructions</h4>
             <ol>
-            <li><strong>Payload range</strong>: set the minimum and maximum payload (in tonnes) to plot. This can be changed later directly on the chart.</li>
-            <li><strong>&#916;v range</strong>: set the minimum and maximum &#916;v (in m/s) to plot. This can be changed later directly on the chart.</li>
-            <li><strong>Minimum TWR</strong>: the minimum acceptable thrust-to-weight ratio of the ship. Set to zero if no restriction is desired. The body of reference can be changed using the dropdown. If Kerbin is used, TWR is equivalent to minimum acceleration, in gees (i.e. a TWR of 1.0 equals 9.8 m/s<sup>2</sup>).</li>
-            <li><strong>Atmosphere</strong>: ambient atmospheric pressure (in atm). Note that many engines have notably smaller efficiencies in the atmosphere. Use the Presets dropdown for a list of KSP bodies with atmospheres.</li>
-            <li><strong>Max # of engines</strong>: configure the maximum number of engines allowed in the analysis. Use it to filter out ridiculous solutions with hundreds of engines. Set the Unlimited checkbox if no limit is desired.</li>
+            <li><strong>Select fixed variable</strong>: set which variable you want to keep fixed out of Payload, Minimum TWR and Delta-v. The other two variables will be plotted.</li>
+            <li><strong>[fixed variable]</strong>: set the value of the variable that will remain fixed.
+            <li><strong>[variable] ranges</strong>: set the minimum and maximum values of the variables to plot. These can be changed later directly on the chart.</li>
+            <li><strong>Atmosphere</strong>: set the atmospheric pressure (in atm). Note that many engines have substantially worse efficiencies in the atmosphere. Use the Presets dropdown to set the pressure from a list of KSP bodies with atmospheres.</li>
+            <li><strong>Max # of engines</strong>: configure the maximum number of engines allowed in the analysis. Use it to filter out ridiculous solutions with hundreds of engines. Check the Unlimited checkbox if no limit is desired.</li>
             <li><strong>Chart quality</strong>: if the chart is taking too long to generate (shouldn't take more than a second), set quality to Low (faster).</li>
             <li><strong>Engine selection</strong>: select the desired engines using the checkboxes on the right of the page.</li>
             </ol>
@@ -1531,58 +190,74 @@ see http://glyphicons.com/license/ for more information.
 
         </h4>
 
+        <!-- Fixed variable selector -->
         <div class="form-group">
-          <label for="payloadmin" class="control-label col-sm-3">Payload range</label>
+          <label id="lblFixedVarPills" class="control-label col-sm-3" style="margin-top: 4px;">Fixed variable</label>
           <div class="col-sm-8">
-            <div class="input-group">
-							<input type="number" class="form-control" id="payloadmin" placeholder="minimum payload" min="0" step="1">
-							<span class="input-group-addon"> to </span>
-							<input type="number" class="form-control" id="payloadmax" placeholder="maximum payload" min="0" step="1">
-              <span class="input-group-addon">tonnes</span>
-						</div>
-					</div>
-				</div>
+            <ul class="nav nav-pills">
+              <li id="pillPayload" class="active"><a data-toggle="tab" href="#tabPayload" onClick="setFixedVar('Payload');">Payload</a></li>
+              <li id="pillTWR"><a data-toggle="tab" href="#tabMinTWR" onClick="setFixedVar('Min TWR');">Min TWR</a></li>
+              <li id="pillDeltav"><a data-toggle="tab" href="#tabDeltaV" onClick="setFixedVar('Delta-v');">Delta-v</a></li>
+            </ul>
+          </div>
+        </div> 
 
+        <!-- Fixed var text inputs -->
         <div class="form-group">
-          <label for="dvmin" class="control-label col-sm-3">&#916;v range</label>
+          <label id="lblFixedVar" for="txtFixedVar" class="control-label col-sm-3">Payload mass</label>
           <div class="col-sm-8">
-            <div class="input-group">
-							<input type="number" class="form-control" id="dvmin" placeholder="minimum &#916;v" min="0" step="100">
-							<span class="input-group-addon"> to </span>
-							<input type="number" class="form-control" id="dvmax" placeholder="maximum &#916;v" min="0" step="100">
-              <span class="input-group-addon">m/s</span>
-						</div>
-					</div>
-				</div>
+            <div id="inputgroupVarFixed" class="input-group">
+              <input id="txtFixedVar" type="number" class="form-control" placeholder="fixed payload mass" min="0" step="1">
+              <span id="unitsFixedVar" class="input-group-addon">tonnes</span>
+            </div>
+          </div>
+        </div>
         
-        <div class="form-group">
-          <label for="minTWR" class="control-label col-sm-3">Minimum TWR</label>
+        <!-- Var1 text inputs-->
+        <div id="formgroupVar1" class="form-group">
+          <label id="lblVar1" for="txtVar1Min" class="control-label col-sm-3">TWR range</label>
           <div class="col-sm-8">
-            <div class="input-group">
-							<input type="number" class="form-control" id="minTWR" placeholder="minimum TWR" min="0" step="0.1">
-              <span class="input-group-addon">relative to</span>
-              <select id="TWRrefSelect" class="form-control">
+            <div id="inputgroupVar1" class="input-group">
+              <input id="txtVar1Min" type="number" class="form-control" placeholder="min TWR" min="0" step="0.1">
+              <span class="input-group-addon"> to </span>
+              <input id="txtVar1Max" type="number" class="form-control" placeholder="max TWR" min="0" step="0.1">
+              <span id="unitsVar1" class="input-group-addon">relative to</span>
+              <select id="TWRrefSelect" class="form-control" style="min-width:85px; padding-left:5px; padding-right:5px;">
                 <option value="Kerbin">Kerbin</option>
-                <option value="Mun">&nbsp;&nbsp;Mun</option>
-                <option value="Minmus">&nbsp;&nbsp;Minmus</option>
+                <option value="Mun">Mun</option>
+                <option value="Minmus">Minmus</option>
                 <option value="Duna">Duna</option>
-                <option value="Ike">&nbsp;&nbsp;Ike</option>
+                <option value="Ike">Ike</option>
                 <option value="Eve">Eve</option>
-                <option value="Gilly">&nbsp;&nbsp;Gilly</option>
+                <option value="Gilly">Gilly</option>
                 <option value="Moho">Moho</option>
                 <option value="Dres">Dres</option>
                 <option value="Jool">Jool</option>
-                <option value="Laythe">&nbsp;&nbsp;Laythe</option>
-                <option value="Vall">&nbsp;&nbsp;Vall</option>
-                <option value="Tylo">&nbsp;&nbsp;Tylo</option>
-                <option value="Bop">&nbsp;&nbsp;Bop</option>
-                <option value="Pol">&nbsp;&nbsp;Pol</option>
+                <option value="Laythe">Laythe</option>
+                <option value="Vall">Vall</option>
+                <option value="Tylo">Tylo</option>
+                <option value="Bop">Bop</option>
+                <option value="Pol">Pol</option>
                 <option value="Eeloo">Eeloo</option>
-              </select>
-						</div>
-					</div>
-				</div>
+              </select>      
+            </div>
+          </div>
+        </div>
 
+        <!-- Var2 text inputs -->
+        <div id="formgroupVar2" class="form-group">
+          <label id="lblVar2" for="txtVar2Min" class="control-label col-sm-3">&#916;v range</label>
+          <div class="col-sm-8">
+            <div id="inputgroupVar2" class="input-group">
+              <input id="txtVar2Min" type="number" class="form-control" placeholder="minimum &#916;v" min="0" step="100">
+              <span class="input-group-addon"> to </span>
+              <input id="txtVar2Max" type="number" class="form-control" placeholder="maximum &#916;v" min="0" step="100">
+              <span id="unitsVar2" class="input-group-addon">m/s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atmospheric pressure -->
         <div class="form-group">
           <label for="atmpres" class="control-label col-sm-3">Atmosphere</label>
           <div class="col-sm-4">
@@ -1592,6 +267,7 @@ see http://glyphicons.com/license/ for more information.
             </div>
           </div>
                  
+          <!-- Atmosphere presets -->
           <div class="col-sm-4">
             <div class="input-group">
             <span class="input-group-addon">Presets:</span>
@@ -1609,6 +285,7 @@ see http://glyphicons.com/license/ for more information.
 
         </div>
             
+        <!-- Max number of engines -->            
         <div class="form-group">
           <label for="maxengines" class="control-label col-sm-3">Max # of engines</label>
           <div class="col-sm-6">
@@ -1621,6 +298,7 @@ see http://glyphicons.com/license/ for more information.
           </div>
 				</div>
 				                 
+        <!-- Chart quality -->                         
         <div class="form-group">
           <label for="quality" class="control-label col-sm-3">Chart quality</label>
           <div class="col-sm-8">
@@ -1633,18 +311,7 @@ see http://glyphicons.com/license/ for more information.
               </label>
             </div>
 					</div>
-				</div>  
-
-<!--
-        <div class="form-group">
-          <label for="useoldname" class="control-label col-sm-3">Other options</label>
-          <div class="col-sm-8">
-            <div class="checkbox">
-              <label><input type="checkbox" id="useoldnamesChk" onChange="toggleUseOldNames()">Use old engine names</label>
-            </div>
-          </div>
-        </div>
--->
+				</div>
 
       </form>
        
@@ -1658,10 +325,11 @@ see http://glyphicons.com/license/ for more information.
       
     </div>
 
+    <!----------------------------------------------------------------->
       
-      <!-- ENGINE SELECTION -->
+    <!-- ENGINE SELECTION -->
       
-      <div class="col-sm-5 col-md-5 col-lg-5">
+    <div class="col-sm-5 col-md-5 col-lg-5">
       <h4>Engine selection
 
       <button class="btn btn-default btn-sm" type="button" data-toggle="collapse" data-target="#EngineSelectionHelp" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-question-sign" style="font-size: 18px;"></span></button>
@@ -1677,9 +345,9 @@ see http://glyphicons.com/license/ for more information.
         </div>
       </div>
 
-
       </h4>
       
+      <!-- Medium engines -->
       <div class="col-sm-3 col-md-3 col-lg-3">
         <form class="form-horizontal">
           <label>Medium</label><br>
@@ -1709,7 +377,8 @@ see http://glyphicons.com/license/ for more information.
           </div>
         </form>
       </div>
-
+      
+      <!-- Heavy engines -->
       <div class="col-sm-3 col-md-3 col-lg-3">
         <form class="form-horizontal">
           <label>Heavy</label><br>
@@ -1740,6 +409,7 @@ see http://glyphicons.com/license/ for more information.
         </form>     
       </div>
       
+      <!-- Light engines -->
       <div class="col-sm-3 col-md-3 col-lg-3">
         <form class="form-horizontal">
           <label>Light</label><br>
@@ -1761,6 +431,7 @@ see http://glyphicons.com/license/ for more information.
         </form>     
       </div>
       
+      <!-- Exotic engines -->
       <div class="col-sm-3 col-md-3 col-lg-3">
         <form class="form-horizontal">
           <label>Exotic</label><br>
@@ -1782,9 +453,10 @@ see http://glyphicons.com/license/ for more information.
       </div>
       
       </div>
-      
 
     </div>
+
+    <!----------------------------------------------------------------->
 
     <div class="row">
     
@@ -1798,19 +470,21 @@ see http://glyphicons.com/license/ for more information.
         
         <div id="controls" style="visibility: hidden;">
       
-        <label for="payzoomGrp">Payload range</label>
-        <div class="btn-group btn-group" role="group" id="payzoomGrp">
-          <button id="payZoomIn" type="button" class="btn btn-default" onClick="zoomAction('in','payload')"><i class="glyphicon glyphicon-plus"></i></button>
-          <button id="payZoomOut" type="button" class="btn btn-default" onClick="zoomAction('out','payload')"><i class="glyphicon glyphicon-minus"></i></button>
+        <label id="lblVar1ZoomGroup" for="var1zoomGrp"></label>
+        <div class="btn-group btn-group" role="group" id="var1zoomGrp">
+          <button id="var1ZoomIn" type="button" class="btn btn-default" onClick="zoomAction('in','var1')"><i class="glyphicon glyphicon-plus"></i></button>
+          <button id="var1ZoomOut" type="button" class="btn btn-default" onClick="zoomAction('out','var1')"><i class="glyphicon glyphicon-minus"></i></button>
         </div>
 
-        &nbsp;&nbsp;<label for="dvzoomGrp">&#916;v range</label>
-        <div class="btn-group btn-group" role="group" id="dvzoomGrp">
-          <button id ="dvZoomIn" type="button" class="btn btn-default" onClick="zoomAction('in','dv')"><i class="glyphicon glyphicon-plus"></i></button>
-          <button id ="dvZoomOut" type="button" class="btn btn-default" onClick="zoomAction('out','dv')"><i class="glyphicon glyphicon-minus"></i></button>
+        &nbsp;&nbsp;
+        <label id="lblVar2ZoomGroup"  for="var2zoomGrp"></label>
+        <div class="btn-group btn-group" role="group" id="var2zoomGrp">
+          <button id ="var2ZoomIn" type="button" class="btn btn-default" onClick="zoomAction('in','var2')"><i class="glyphicon glyphicon-plus"></i></button>
+          <button id ="var2ZoomOut" type="button" class="btn btn-default" onClick="zoomAction('out','var2')"><i class="glyphicon glyphicon-minus"></i></button>
         </div>     
 
-        &nbsp;&nbsp;<label for="recallGrp">Recall ranges</label>
+        &nbsp;&nbsp;
+        <label for="recallGrp">Recall ranges</label>
         <div class="btn-group btn-group" role="group" id="recallGrp">
           <button id="recallBack" class="btn btn-default" disabled="disabled" onClick="recallSettings(-1)"><span class="glyphicon glyphicon-arrow-left"></span></button>
           <button id="recallForward" class="btn btn-default" disabled="disabled" onClick="recallSettings(+1)"><span class="glyphicon glyphicon-arrow-right"></span></button>
@@ -1818,8 +492,11 @@ see http://glyphicons.com/license/ for more information.
  
         &nbsp;&nbsp;<a href="#" id="downloader" onClick="saveCanvas()" download="test.png"><button id="savebutton" class="btn btn-primary">Save chart</button></a>
 
-        <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#controlsHelpArea" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-question-sign" style="font-size: 18px;"></span></button>
+        <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#controlsHelpArea" aria-expanded="false" aria-controls="collapseExample">
+          <span class="glyphicon glyphicon-question-sign" style="font-size: 18px;"></span>
+        </button>
 
+        <!-- Collapsible tooltip -->
         <div class="collapse" id="controlsHelpArea">
           <br>
           <div class="well">
@@ -1832,9 +509,8 @@ see http://glyphicons.com/license/ for more information.
             </ul>            
             Chart controls:
             <ul>
-            <li>Use <strong>payload range</strong> buttons to shrink/zoom-in (+) or expand/zoom-out (-) the range of payloads shown.</li>
-            <li>Use <strong>&#916;v range</strong> buttons to shrink/zoom-in (+) or expand/zoom-out (-) the range of &#916;v shown.</li>
-            <li><strong>Recall ranges</strong> allows to go back and forward from current to past payload/&#916;v range settings.</li>
+            <li>Use <strong>[variable] range</strong> buttons to shrink/zoom-in (+) or expand/zoom-out (-) the ranges of the variables shown.</li>
+            <li><strong>Recall ranges</strong> allows to go back and forward from current to past TWR/payload/&#916;v range settings.</li>
             <li><strong>Save chart</strong> to save the current chart as a png image.</li>
             </ul>
           </div>
@@ -1851,13 +527,14 @@ see http://glyphicons.com/license/ for more information.
         <br><br>
         <div id="detailspane" class="panel panel-primary" style="visibility: hidden;">
           
+          <!-- Panel Header -->
           <div class="panel-heading">
             <div class="panel-title" style="font-size: 18px;"><strong>Engine Analysis Details</strong><span style="float: right;"><span id="lockedTooltip" style="visibility: hidden;"><span style="font-variant: small-caps;">locked</span>&nbsp;<span data-toggle="tooltip" title="The details panel is currently locked to the highlighted location in the chart.<br>Click on the chart area again to unlock." data-html="true" data-placement="top" class="glyphicon glyphicon-question-sign" style="font-size: 14px;"></span></span></div>
             <table style="width: 100%;">
               <tr>
                 <td>
-                <span style="float: left;">Min TWR: <span id="lblMinTWR" style="font-weight: strong;"></span></span>
-                <span style="float: right;">Pressure: <span id="lblPressure" style="font-weight: strong;"></span></span>
+                <span id="lblDetailsFixedVar" style="float: left; font-size: 16px;">&nbsp;</span>
+                <span id="lblDetailsPressure" style="float: right; font-size: 16px;">&nbsp;</span>
                 </td>
               </tr>
             </table>
@@ -1866,19 +543,21 @@ see http://glyphicons.com/license/ for more information.
           <div class="panel-body" style="padding: 8px; padding-bottom: 4px;">
           <div class="panel-group" style="margin-bottom: 4px;">
           
+            <!-- Values at chart location under mouse -->
             <div class="panel panel-success">
               <div class="panel-heading">
               <div class="panel-title" style="font-size: 18px;">
               <table style="width: 100%; table-layout: fixed;">
                 <tr>
-                <td>Payload: <span id="lblPayload" style="font-weight: bold;">&nbsp;</span></td>
-                <td>&#916;v: <span id="lblDeltav" style="font-weight: bold;">&nbsp;</span></td>
+                <td><span id="lblDetailsVar1Name">&nbsp;</span><span id="lblDetailsVar1Value" style="font-weight: bold;">&nbsp;</span></td>
+                <td><span id="lblDetailsVar2Name">&nbsp;</span><span id="lblDetailsVar2Value" style="font-weight: bold;">&nbsp;</span></td>
                 </tr>
               </table>
               </div>
               </div>
             </div>
 
+            <!-- Results for Best engine -->
             <div class="panel panel-info">
               <div class="panel-heading">
               <div class="panel-title">
@@ -1956,6 +635,7 @@ see http://glyphicons.com/license/ for more information.
               </div>
             </div>
 
+            <!-- Results for Runner-up -->
             <div class="panel panel-info">
               <div class="panel-heading">
               <div class="panel-title">
@@ -1974,13 +654,12 @@ see http://glyphicons.com/license/ for more information.
                   <td colspan="3"><span id="lblRunnerupBurnoutTime">&nbsp;</span></td>                
                 </tr>
                 <tr>
-                  <td style="width: 50%;"><strong>Acceleration</strong></td>
+                  <td style="width: 50%;"><strong>Acceleration</strong> (m/s<sup>2</sup>)</td>
                   <td style="width: 15%;"><span id="lblRunnerupMinAccel">&nbsp;</span></td>
                   <td style="width: 15%;"><span id="lblRunnerupAvgAccel">&nbsp;</span></td>
                   <td style="width: 15%;"><span id="lblRunnerupMaxAccel">&nbsp;</span></td>
                 </tr>
                 <tr>
-                  <td>(m/s<sup>2</sup>)</td>
                   <td>min</td>
                   <td>avg</td>
                   <td>max</td>
@@ -2042,6 +721,8 @@ see http://glyphicons.com/license/ for more information.
 
     </div>
 
+  <!----------------------------------------------------------------->
+
   <hr>
   <h4>Acknowledgements</h4>
 
@@ -2051,13 +732,13 @@ see http://glyphicons.com/license/ for more information.
     <li>Special thanks to Slashy, LittleBlueGaming, Teilnehmer, John FX, Red Iron Crown, 5thHorseman, Brotoro, cybersol, Starhawk and other members of the <a href="http://forum.kerbalspaceprogram.com/">KSP forums</a> for helpful suggestions and beta testing.</li>
   </ul>
 
-  <p>Development thread: <a href="http://forum.kerbalspaceprogram.com/index.php?/topic/114995-web-105-optimal-engine-charts-interactive-webapp/">KSP Forums</a></p>
+  <p>Development: KSP Forums <a href="http://forum.kerbalspaceprogram.com/index.php?/topic/114995-web-105-optimal-engine-charts-interactive-webapp/">dev thread</a> | Github <a href="https://github.com/meithan/engine_charts">repository</a>.</p>
 
   <p><em>Optimal Engine Charts</em> is free software licensed under the <a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License v3</a>. Third-party additional software is used under the terms of the corresponding licenses. Built with <a href="http://paperjs.org/">Paper.js</a> and <a href="https://jquery.com/">jquery.js</a>. Styles by <a href="http://getbootstrap.com/">Twitter Bootstrap</a>. Icons by <a href="http://glyphicons.com/">Glyphicons</a>.</p>
 
   <p>Copyleft <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Copyleft.svg/100px-Copyleft.svg.png" style="max-height: 14px; max-width: 14px;"> Meithan West, 2015. Some rights reserved.</p>
 
-  <p>Current version: 1.0.1</p>
+  <p>Current version: 1.1.0</p>
   
   </div>
  
