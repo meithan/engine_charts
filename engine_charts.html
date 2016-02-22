@@ -2,7 +2,7 @@
 <html>
 <head>
 
-<!-- LICENSE NOTICE --
+<!-- LICENSE NOTICE
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses/.
 
----
+***
 
 Third-party included JavaScript libraries are copyright their respective
 owners and are used under the term of the corresponding licenses:
@@ -38,6 +38,9 @@ terms of the Creative Commons Attribution 3.0 Unported (CC BY 3.0) license;
 see http://glyphicons.com/license/ for more information.
 
 -->
+
+<link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
+<title>KSP Engine Charts</title>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="js/jquery.min.js"></script>
@@ -150,7 +153,7 @@ see http://glyphicons.com/license/ for more information.
     paper.view.draw();
     
     // Load engine definitions
-    // Updated for 1.0.4
+    // Updated for KSP 1.0.5
     allEngines = [
       new Engine("LV-909", "Terrier", 0.5, 60, [[0,345], [1,85], [3,0.001]], 8),
       new Engine("LV-T30", "Reliant", 1.25, 215, [[0,300], [1,280], [7,0.001]], 8),
@@ -170,7 +173,8 @@ see http://glyphicons.com/license/ for more information.
       new Engine("24-77", "Twitch", 0.09, 16, [[0,290], [1,250], [7,0.001]], 8),
       new Engine("48-7S", "Spark", 0.1, 18, [[0,300], [1,270], [7,0.001]], 8),
       new Engine("O-10", "Puff", 0.09, 20, [[0,250], [1,120], [4,0.001]], 6),
-      new Engine("IX-6315", "Dawn", 0.25, 2, [[0,4200], [1,100], [1.2,0.001]], 8)
+      new Engine("IX-6315", "Dawn", 0.25, 2, [[0,4200], [1,100], [1.2,0.001]], 8),
+      new Engine("KS-25", "Vector", 4, 1000, [[0,315], [1,295], [12,0.001]], 8)
     ];
     console.log(allEngines.length + " engines loaded");
     console.log(allEngines);
@@ -527,7 +531,7 @@ see http://glyphicons.com/license/ for more information.
     
     var buf1, buf2;
     if (isNaN(results[0][1])) {
-      buf1 = "no solution";
+      buf1 = "No solution";
       buf2 = "";
     } else {
       buf1 = "Best: " + results[0][0].fullname + " \u00D7 " + results[0][2];
@@ -550,7 +554,7 @@ see http://glyphicons.com/license/ for more information.
     $('#lblBestBurnTime4').html(nicetime(results[0][14]));
     
     if (isNaN(results[1][1])) {
-      buf1 = "no solution";
+      buf1 = "No solution";
       buf2 = "";
     } else {
       buf1 = "Runner-up: " + results[1][0].fullname + " \u00D7 " + results[1][2];
@@ -1495,7 +1499,7 @@ see http://glyphicons.com/license/ for more information.
   <div class="container">
   
     <header class="page-header">
-    <h1>Optimal Engine Charts <small>for Kerbal Space Program 1.0.4</small></h1>
+    <h1>Optimal Engine Charts <small>for Kerbal Space Program 1.0.5</small></h1>
     </header>
  
     <div class="row">
@@ -1645,10 +1649,10 @@ see http://glyphicons.com/license/ for more information.
       </form>
        
       <br>
-      <button type="button" id="chartSubmit" class="btn btn-primary" onClick="calculateButton()">
+      <button type="button" id="calculateBtn" class="btn btn-primary" onClick="calculateButton()">
       Calculate!
       </button>
-      <button type="button" id="defaultValues" class="btn btn-primary" onClick="load_example()">
+      <button type="button" id="exampleBtn" class="btn btn-default" onClick="load_example()">
       Load example
       </button>
       
@@ -1716,6 +1720,9 @@ see http://glyphicons.com/license/ for more information.
             </div>
             <div class="checkbox">
               <label><input type="checkbox" name="heavyengines" id="chkRE-I5" checked>RE-I5<br>"Skipper"</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="heavyengines" id="chkKS-25" checked>KS-25<br>"Vector"</label>
             </div>
             <div class="checkbox">
               <label><input type="checkbox" name="heavyengines" id="chkRE-M3" checked>RE-M3<br>"Mainsail"</label>
@@ -2044,11 +2051,13 @@ see http://glyphicons.com/license/ for more information.
     <li>Special thanks to Slashy, LittleBlueGaming, Teilnehmer, John FX, Red Iron Crown, 5thHorseman, Brotoro, cybersol, Starhawk and other members of the <a href="http://forum.kerbalspaceprogram.com/">KSP forums</a> for helpful suggestions and beta testing.</li>
   </ul>
 
+  <p>Development thread: <a href="http://forum.kerbalspaceprogram.com/index.php?/topic/114995-web-105-optimal-engine-charts-interactive-webapp/">KSP Forums</a></p>
+
   <p><em>Optimal Engine Charts</em> is free software licensed under the <a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License v3</a>. Third-party additional software is used under the terms of the corresponding licenses. Built with <a href="http://paperjs.org/">Paper.js</a> and <a href="https://jquery.com/">jquery.js</a>. Styles by <a href="http://getbootstrap.com/">Twitter Bootstrap</a>. Icons by <a href="http://glyphicons.com/">Glyphicons</a>.</p>
 
   <p>Copyleft <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Copyleft.svg/100px-Copyleft.svg.png" style="max-height: 14px; max-width: 14px;"> Meithan West, 2015. Some rights reserved.</p>
 
-  <p>Current version: 1.0.0</p>
+  <p>Current version: 1.0.1</p>
   
   </div>
  

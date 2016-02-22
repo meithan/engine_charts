@@ -3,7 +3,6 @@
 #### An interactive webapp for Kerbal Space Program v1.0.5
 
 ##### Live URL: [http://meithan.net/KSP/engines](http://meithan.net/KSP/engines/)
-.
 
 #### Description
 
@@ -33,10 +32,11 @@ Fore more info (like details on how the calculations are done) or to leave a mes
 
 ##### Version history
 
+* 1.0.1 (February 19, 2015): Updated engine stats to 1.0.5 (only change is the addition of the Vector engine).
 * 1.0.0 (June 30, 2015): Initial release.
 
 ##### License
 
 Optimal Engine Charts is free software licensed under the GNU General Public License v3. Third-party additional software is used under the terms of the corresponding licenses. Built with Paper.js and jquery.js. Styles by Twitter Bootstrap. Icons by Glyphicons.
 
-Copyleft ![](http://i.imgur.com/4R84dsR.png) Meithan West, 2015. Some rights reserved.
+Copyleft ![](http://i.imgur.com/4R84dsR.png) Meithan West, 2016. Some rights reserved.
