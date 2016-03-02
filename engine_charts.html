@@ -137,7 +137,7 @@ see http://glyphicons.com/license/ for more information.
     console.log(allEngines);
 
     // Default fixed var
-    setFixedVar("payload");
+    setFixedVar("Payload");
 
     console.log("Ready.");
 
@@ -175,10 +175,10 @@ see http://glyphicons.com/license/ for more information.
           <div class="well" style="font-size: 15px;">
             <h4>Basic Instructions</h4>
             <ol>
-            <li><strong>Select fixed variable</strong>: set which variable you want to keep fixed out of Payload, Minimum TWR and Delta-v. The other two variables will be plotted.</li>
+            <li><strong>Select fixed variable</strong>: set which variable you want to keep fixed out of Payload, Minimum TWR and Delta-v. The other two variables will be on the axes of the plot.</li>
             <li><strong>[fixed variable]</strong>: set the value of the variable that will remain fixed.
             <li><strong>[variable] ranges</strong>: set the minimum and maximum values of the variables to plot. These can be changed later directly on the chart.</li>
-            <li><strong>Atmosphere</strong>: set the atmospheric pressure (in atm). Note that many engines have substantially worse efficiencies in the atmosphere. Use the Presets dropdown to set the pressure from a list of KSP bodies with atmospheres.</li>
+            <li><strong>Atmosphere</strong>: set the atmospheric pressure (in atm). Note that many engines have substantially worse efficiencies (Isp) in the atmosphere. Use the Presets dropdown to set the pressure from a list of KSP bodies with atmospheres.</li>
             <li><strong>Max # of engines</strong>: configure the maximum number of engines allowed in the analysis. Use it to filter out ridiculous solutions with hundreds of engines. Check the Unlimited checkbox if no limit is desired.</li>
             <li><strong>Chart quality</strong>: if the chart is taking too long to generate (shouldn't take more than a second), set quality to Low (faster).</li>
             <li><strong>Engine selection</strong>: select the desired engines using the checkboxes on the right of the page.</li>
@@ -289,7 +289,7 @@ see http://glyphicons.com/license/ for more information.
         <div class="form-group">
           <label for="maxengines" class="control-label col-sm-3">Max # of engines</label>
           <div class="col-sm-6">
-            <input type="number" class="form-control" id="maxengines" value="50" min="1" step="1">
+            <input type="number" class="form-control" id="maxengines" value="10" min="1" step="1">
           </div>
           <div class="col-sm-3">
             <div class="checkbox">
@@ -438,14 +438,14 @@ see http://glyphicons.com/license/ for more information.
           <button type="button" class="btn btn-default btn-xs" onClick="toggleboxes('exoticengines')">Toggle all</button>
           <div class="input-group">
             <div class="checkbox">
-              <label><input type="checkbox" name="exoticengines" id="chkO-10" checked>O-10<br>"Puff"&nbsp;<span data-toggle="tooltip" title="Assumed to be paired with RCS tanks that have a full-to-dry mass ratio of 7 (rough average for ingame tanks)." data-html="true" data-placement="bottom" class="glyphicon glyphicon-info-sign" style="font-size: 14px;"></span></label>
+              <label><input type="checkbox" name="exoticengines" id="chkO-10" checked>O-10<br>"Puff"&nbsp;<span data-toggle="tooltip" title="Assumed to be paired with RCS tanks that have a full-to-dry mass ratio of 7 (rough average for stock tanks)." data-html="true" data-placement="bottom" class="glyphicon glyphicon-info-sign" style="font-size: 14px;"></span></label>
             </div>
             <div style="border: 1px solid rgba(0, 0, 0, 0.3); padding-left: 5px; padding-right: 5px; border-radius: 5px;">
             <div class="checkbox">
-              <label><input type="checkbox" name="exoticengines" id="chkIX-6315" checked onChange="changeDawnChk()">IX-6315<br>"Dawn"<span data-toggle="tooltip" title="Assumed to be paired with xenon tanks that have a full-to-dry mass ratio of 2.3 (about average for ingame tanks)." data-html="true" data-placement="bottom" class="glyphicon glyphicon-info-sign" style="font-size: 14px;"></span></label>
+              <label><input type="checkbox" name="exoticengines" id="chkIX-6315" checked onChange="changeDawnChk()">IX-6315<br>"Dawn"<span data-toggle="tooltip" title="Assumed to be paired with xenon tanks that have a full-to-dry mass ratio of 2.3 (about average for stock tanks)." data-html="true" data-placement="bottom" class="glyphicon glyphicon-info-sign" style="font-size: 14px;"></span></label>
             </div>
             <div class="checkbox">
-              <label><input type="checkbox" id="chkDawnSP" checked>include<br>panels&nbsp;<span data-toggle="tooltip" title="Include 100 kg to roughly account for the mass of solar panels needed to continuously operate the engine at Kerbin's distance from the Sun." data-html="true" data-placement="bottom" class="glyphicon glyphicon-info-sign" style="font-size: 14px;"></span></label>
+              <label><input type="checkbox" id="chkDawnSP" checked>include<br>panels&nbsp;<span data-toggle="tooltip" title="Adds 100 kg per engine to roughly account for the mass of solar panels needed to continuously operate the engine at Kerbin's distance from the Sun." data-html="true" data-placement="bottom" class="glyphicon glyphicon-info-sign" style="font-size: 14px;"></span></label>
             </div>
             </div>
           </div>
@@ -502,15 +502,15 @@ see http://glyphicons.com/license/ for more information.
           <div class="well">
             Chart interactivity:
             <ul>
-            <li><strong>Mouse over</strong> the chart to see details for the (payload, &#916;v) point under the mouse in the panel to the right.</li>
+            <li><strong>Mouse over</strong> the chart to see additional details about the point under the mouse in the right-hand panel.</li>
             <li><strong>Click</strong> on the chart to lock the details panel to a specific point in the chart; click again to unlock.</li>
             <li><strong>Click-and-drag</strong> to pan the currently displayed view; the chart will be recomputed with the new ranges.</li>
-            <li><strong>Hold</strong> the <strong>CTRL key</strong> and click-and-drag to zoom the chart to the selected area.</li>
+            <li><strong>Hold</strong> the <strong>CTRL key</strong> and click-and-drag to zoom the chart in to the selected area.</li>
             </ul>            
             Chart controls:
             <ul>
-            <li>Use <strong>[variable] range</strong> buttons to shrink/zoom-in (+) or expand/zoom-out (-) the ranges of the variables shown.</li>
-            <li><strong>Recall ranges</strong> allows to go back and forward from current to past TWR/payload/&#916;v range settings.</li>
+            <li>Use <strong>[variable] range</strong> buttons to (+) shrink (zoom-in) (+) or (-) expand (zoom-out) the ranges of the variables shown.</li>
+            <li><strong>Recall ranges</strong> allows to go back and forward between past range settings.</li>
             <li><strong>Save chart</strong> to save the current chart as a png image.</li>
             </ul>
           </div>
@@ -660,6 +660,7 @@ see http://glyphicons.com/license/ for more information.
                   <td style="width: 15%;"><span id="lblRunnerupMaxAccel">&nbsp;</span></td>
                 </tr>
                 <tr>
+                  <td>&nbsp;</td>
                   <td>min</td>
                   <td>avg</td>
                   <td>max</td>
@@ -738,7 +739,7 @@ see http://glyphicons.com/license/ for more information.
 
   <p>Copyleft <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Copyleft.svg/100px-Copyleft.svg.png" style="max-height: 14px; max-width: 14px;"> Meithan West, 2015. Some rights reserved.</p>
 
-  <p>Current version: 1.1.0</p>
+  <p>Current version: 1.1.1</p>
   
   </div>
  

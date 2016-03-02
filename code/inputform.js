@@ -98,7 +98,7 @@ function load_example () {
   $('#TWRrefSelect').val("Kerbin");
   $('#atmpres').val('0');
   $('#atmpresetsmenu').val("vacuum");
-  $('#maxengines').val('20');
+  $('#maxengines').val('10');
   $('#unlimitedchkbox').prop('checked',false);
   $('#maxengines').prop('disabled',false);
   $('input[type=radio]').prop('checked', function () {
