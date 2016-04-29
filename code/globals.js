@@ -48,7 +48,7 @@ surfgrav = {
 }
   
 // Load engine definitions
-// Updated for KSP 1.0.5
+// Values updated for KSP 1.1.1
 allEngines = [
   new Engine("LV-909", "Terrier", 0.5, 60, [[0,345], [1,85], [3,0.001]], 8),
   new Engine("LV-T30", "Reliant", 1.25, 215, [[0,300], [1,280], [7,0.001]], 8),

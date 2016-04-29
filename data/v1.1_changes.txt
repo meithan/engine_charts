@@ -1,0 +1,18 @@
+LV-909:   no changes
+LV-T30:   no changes
+LV-T45:   no changes
+LV-N:     no changes
+Mk-55:    no changes
+RAPIER:   no changes
+Skipper:  no changes
+Mainsail: no changes
+Mammoth:  no changes
+LV-1R:    no changes
+24-77:    no changes
+48-7S:    no changes
+O-10:     no changes
+Dawn:     no changes
+Vector:   no changes
+
+Summary:
+No changes with respect to 1.0.5

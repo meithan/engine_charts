@@ -1,35 +1,65 @@
 # Reads the engine stats directly from the game's cfg files
 # Outputs the relevant JavaScript code with the data
 
-# List of (name, nickname, cfg file) tuples to process
+# ================================
+
+# CONFIGURE PATH TO TOP-LEVEL KSP DIRECTORY HERE
+# (or use ./ and run script directly in topdir)
+KSP_dir = "./"
+
+# ================================
+
+# List of engine config tuples (name, nickname, cfg file) to process
+if not KSP_dir.endswith("/"): KSP_dir += "/"
+path = KSP_dir + "GameData/Squad/Parts/Engine/"
 engines = [
-("LV-909", "Terrier", "Engine/liquidEngineLV-909/liquidEngineLV-909.cfg"),
-("LV-T30", "Reliant", "Engine/liquidEngineLV-T30/liquidEngineLV-T30.cfg"),
-("LV-T45", "Swivel", "Engine/liquidEngineLV-T45/liquidEngineLV-T45.cfg"),
-("T-1", "Aerospike", "Engine/liquidEngineAerospike/liquidEngineAerospike.cfg"),
-("LV-N", "Nerv", "Engine/liquidEngineLV-N/liquidEngineLV-N.cfg"),
-("Mk-55", "Thud", "Engine/liquidEngineMk55/liquidEngineMk55.cfg"),
-("CR-7", "RAPIER", "Engine/rapierEngine/rapierEngine.cfg"),
-("RE-L10", "Poodle", "Engine/liquidEnginePoodle/liquidEnginePoodle.cfg"),
-("RE-I5", "Skipper", "Engine/liquidEngineSkipper/skipperLiquidEngine.cfg"),
-("RE-M3", "Mainsail", "Engine/liquidEngineMainsail/liquidEngineMainsail.cfg"),
-("KR-2L", "Rhino", "Engine/Size3AdvancedEngine/part.cfg"),
-("KS-25x4", "Mammoth", "Engine/Size3EngineCluster/part.cfg"),
-("KR-1x2", "Twin Boar", "Engine/Size2LFB/part.cfg"),
-("LV-1", "Ant", "Engine/liquidEngineLV-1/liquidEngineLV-1.cfg"),
-("LV-1R", "Spider", "Engine/liquidEngineLV-1R/liquidEngineLV-1R.cfg"),
-("24-77", "Twitch", "Engine/liquidEngine24-77/liquidEngine24-77.cfg"),
-("48-7S", "Spark", "Engine/liquidEngine48-7S/liquidEngine48-7S.cfg"),
-("O-10", "Puff", "Engine/OMSEngine/omsEngine.cfg"),
-("IX-6315", "Dawn", "Engine/ionEngine/ionEngine.cfg"),
-("KS-25", "Vector", "Engine/liquidEngineSSME/SSME.cfg")
+("LV-909", "Terrier", "liquidEngineLV-909/liquidEngineLV-909.cfg"),
+("LV-T30", "Reliant", "liquidEngineLV-T30/liquidEngineLV-T30.cfg"),
+("LV-T45", "Swivel", "liquidEngineLV-T45/liquidEngineLV-T45.cfg"),
+("T-1", "Aerospike", "liquidEngineAerospike/liquidEngineAerospike.cfg"),
+("LV-N", "Nerv", "liquidEngineLV-N/liquidEngineLV-N.cfg"),
+("Mk-55", "Thud", "liquidEngineMk55/liquidEngineMk55.cfg"),
+("CR-7", "RAPIER", "rapierEngine/rapierEngine.cfg"),
+("RE-L10", "Poodle", "liquidEnginePoodle/liquidEnginePoodle.cfg"),
+("RE-I5", "Skipper", "liquidEngineSkipper/skipperLiquidEngine.cfg"),
+("RE-M3", "Mainsail", "liquidEngineMainsail/liquidEngineMainsail.cfg"),
+("KR-2L", "Rhino", "Size3AdvancedEngine/part.cfg"),
+("KS-25x4", "Mammoth", "Size3EngineCluster/part.cfg"),
+("KR-1x2", "Twin Boar", "Size2LFB/part.cfg"),
+("LV-1", "Ant", "liquidEngineLV-1/liquidEngineLV-1.cfg"),
+("LV-1R", "Spider", "liquidEngineLV-1R/liquidEngineLV-1R.cfg"),
+("24-77", "Twitch", "liquidEngine24-77/liquidEngine24-77.cfg"),
+("48-7S", "Spark", "liquidEngine48-7S/liquidEngine48-7S.cfg"),
+("O-10", "Puff", "OMSEngine/omsEngine.cfg"),
+("IX-6315", "Dawn", "ionEngine/ionEngine.cfg"),
+("KS-25", "Vector", "liquidEngineSSME/SSME.cfg")
 ]
+
+# ================================
+
+# Returns number as string without trailing zeros (and decimal point if
+# no decimals required)
+def nice(number):
+  s = "%f" % number
+  if "." in s: s = s.rstrip('0').rstrip('.')
+  return s
+
+# Formats the atmosphere curve as a string
+def niceatmocurve(curve):
+  buf = "["
+  for i,point in enumerate(curve):
+    buf += "[%s,%s]" % (nice(point[0]), nice(point[1]))
+    if i < len(curve)-1: buf += ", "
+  buf += "]"
+  return buf
+
+# ================================
 
 # Parse cfg files
 results = []
 for engine in engines:
   params = []
-  f = open(engine[2],"r")
+  f = open(path+engine[2],"r")
   line = f.readline()
   cyclemode = None
   while line != '':
@@ -53,22 +83,6 @@ for engine in engines:
   else:
     print "Couldn't parse all values for %s!" % engine[1]
     print params
-
-# Returns number as string without trailing zeros (and decimal point if
-# no decimals required)
-def nice(number):
-  s = "%f" % number
-  if "." in s: s = s.rstrip('0').rstrip('.')
-  return s
-
-# Formats the atmosphere curve as a string
-def niceatmocurve(curve):
-  buf = "["
-  for i,point in enumerate(curve):
-    buf += "[%s,%s]" % (nice(point[0]), nice(point[1]))
-    if i < len(curve)-1: buf += ", "
-  buf += "]"
-  return buf
 
 # Output JavaScript code
 print "    allEngines = ["
